@@ -119,6 +119,7 @@ if mode == "Single Propeller":
                 key="single_rpm_slider"
             )
             filtered = df[(df['RPM'] >= rpm_min) & (df['RPM'] <= rpm_max)]
+            filtered['Efficiency'] = filtered['Efficiency'].clip(lower=0, upper=1)
 
             fig, ax = plt.subplots()
             ax.plot(filtered['RPM'], filtered['Efficiency'],
@@ -241,6 +242,9 @@ else:
 
             df1_filtered = df1[(df1['RPM'] >= rpm_min) & (df1['RPM'] <= rpm_max)]
             df2_filtered = df2[(df2['RPM'] >= rpm_min) & (df2['RPM'] <= rpm_max)]
+            df1_filtered['Efficiency'] = df1_filtered['Efficiency'].clip(lower=0, upper=1)
+            df2_filtered['Efficiency'] = df2_filtered['Efficiency'].clip(lower=0, upper=1)
+
 
             fig, ax = plt.subplots()
             ax.plot(df1_filtered['RPM'], df1_filtered['Efficiency'],
@@ -359,3 +363,4 @@ else:
             - The direct comparison shows which propeller is more sustainable in terms of energy use and CO₂ emissions.
             - The advice is contextual: larger diameter props (like APC_15x10) are better for heavy lift, while smaller ones (like APC_6x3) suit micro UAVs.
             """)
+
