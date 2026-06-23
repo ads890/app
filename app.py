@@ -43,7 +43,11 @@ def normalize_columns(df):
     return df
 
 def clean_uploaded_csv(uploaded_file):
-    df = pd.read_csv(uploaded_file)
+    # Accept either a file-like/path (from uploader) or a pre-read DataFrame
+    if isinstance(uploaded_file, pd.DataFrame):
+        df = uploaded_file.copy()
+    else:
+        df = pd.read_csv(uploaded_file)
     df = normalize_columns(df)
 
     required_cols = {"RPM", "Efficiency", "PWR"}
@@ -207,22 +211,26 @@ else:
     uploaded_file2 = st.file_uploader("Upload second propeller CSV (optional)", type=["csv"], key="upload2")
 
     if uploaded_file1 is not None:
-        df1 = clean_uploaded_csv(uploaded_file1)
+        raw_df1 = pd.read_csv(uploaded_file1)
+        df1 = clean_uploaded_csv(raw_df1)
         prop1_label = uploaded_file1.name.replace(".csv","")
         prop1_info = {"Diameter": "-", "Pitch": "-", "Use": "Custom dataset"}
     else:
         prop1 = st.selectbox("Choose first propeller", propellers, index=0)
-        df1 = pd.read_csv(f"data/{prop1}")
+        raw_df1 = pd.read_csv(f"data/{prop1}")
+        df1 = clean_uploaded_csv(raw_df1)
         prop1_label = prop1.replace(".csv","")
         prop1_info = prop_info[prop1]
 
     if uploaded_file2 is not None:
-        df2 = clean_uploaded_csv(uploaded_file2)
+        raw_df2 = pd.read_csv(uploaded_file2)
+        df2 = clean_uploaded_csv(raw_df2)
         prop2_label = uploaded_file2.name.replace(".csv","")
         prop2_info = {"Diameter": "-", "Pitch": "-", "Use": "Custom dataset"}
     else:
         prop2 = st.selectbox("Choose second propeller", propellers, index=1)
-        df2 = pd.read_csv(f"data/{prop2}")
+        raw_df2 = pd.read_csv(f"data/{prop2}")
+        df2 = clean_uploaded_csv(raw_df2)
         prop2_label = prop2.replace(".csv","")
         prop2_info = prop_info[prop2]
 
@@ -363,4 +371,3 @@ else:
             - The direct comparison shows which propeller is more sustainable in terms of energy use and CO₂ emissions.
             - The advice is contextual: larger diameter props (like APC_15x10) are better for heavy lift, while smaller ones (like APC_6x3) suit micro UAVs.
             """)
-
